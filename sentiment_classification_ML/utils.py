@@ -1,7 +1,7 @@
 # coding: utf-8
 '''
 filename: utils.py
-function: 通用工具函数
+function: General utility functions
 '''
 
 import os
@@ -10,31 +10,31 @@ import re
 from config import CONTRACTIONS
 
 def ensure_directory(directory):
-    """确保目录存在，如果不存在则创建"""
+    """Ensure directory exists, create if not exists"""
     if not os.path.exists(directory):
         os.makedirs(directory)
-        print(f"已创建目录: {directory}")
+        print(f"Directory created: {directory}")
 
 def save_excel(df, filepath):
-    """保存DataFrame到Excel文件"""
+    """Save DataFrame to Excel file"""
     directory = os.path.dirname(filepath)
     ensure_directory(directory)
     df.to_excel(filepath, index=False)
-    print(f"文件已保存: {filepath}")
+    print(f"File saved: {filepath}")
 
 def load_excel(filepath):
-    """加载Excel文件到DataFrame"""
+    """Load Excel file to DataFrame"""
     if not os.path.exists(filepath):
-        print(f"文件不存在: {filepath}")
+        print(f"File does not exist: {filepath}")
         return None
     return pd.read_excel(filepath)
 
 def word_replace(text):
-    """替换文本中的缩写形式为全称形式"""
+    """Replace contractions in text with their expanded forms"""
     for contraction, expansion in CONTRACTIONS.items():
         text = text.replace(contraction, expansion)
     return text
 
 def is_digit(word):
-    """检查单词是否为数字"""
+    """Check if a word is a digit"""
     return bool(re.match(r'\d+', word))

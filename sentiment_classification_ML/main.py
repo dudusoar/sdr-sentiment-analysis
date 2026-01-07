@@ -165,20 +165,20 @@ def binary_test(test_type='comprehensive', test_model=None, test_feature=None, t
     print(f"Starting binary classification test: {test_type}")
     
     if test_type == 'comprehensive':
-        # 运行完整测试
+        # Run complete test
         run_comprehensive_binary_test()
     elif test_type == 'specific':
-        # 运行特定配置测试
+        # Run specific configuration test
         if not all([test_model, test_feature, test_strategy]):
-            print("特定测试需要指定模型、特征和策略")
+            print("Specific test requires specifying model, feature, and strategy")
             return
         
-        # 加载Word2Vec模型 (如果需要)
+        # Load Word2Vec model (if needed)
         word2vec_model = None
         if test_feature == 'Word2Vec':
             word2vec_model = load_word2vec_model('data')
             if word2vec_model is None:
-                print("Word2Vec模型加载失败，无法进行测试")
+                print("Word2Vec model loading failed, cannot proceed with test")
                 return
         
         results = run_specific_test(
@@ -190,41 +190,41 @@ def binary_test(test_type='comprehensive', test_model=None, test_feature=None, t
             word2vec_model=word2vec_model
         )
         
-        print("测试结果:")
-        print(f"平均ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
+        print("Test results:")
+        print(f"Average ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
         for name, auc in zip(results['dataset_names'], results['roc_aucs']):
             print(f"  {name}: {auc:.4f}")
     
-    print("✅ 二分类测试完成")
+    print("✅ Binary classification test completed")
 
 def main():
-    parser = argparse.ArgumentParser(description='YouTube配送机器人情感分析')
+    parser = argparse.ArgumentParser(description='YouTube delivery robot sentiment analysis')
     
-    # 基本功能
-    parser.add_argument('--prepare', action='store_true', help='准备数据')
-    parser.add_argument('--analyze', action='store_true', help='分析数据')
-    parser.add_argument('--train', action='store_true', help='训练模型')
+    # Basic functions
+    parser.add_argument('--prepare', action='store_true', help='Prepare data')
+    parser.add_argument('--analyze', action='store_true', help='Analyze data')
+    parser.add_argument('--train', action='store_true', help='Train models')
     
-    # Word2Vec相关
-    parser.add_argument('--setup-word2vec', action='store_true', help='设置Word2Vec模型')
-    parser.add_argument('--fix-word2vec', action='store_true', help='修复Word2Vec编码问题')
+    # Word2Vec related
+    parser.add_argument('--setup-word2vec', action='store_true', help='Set up Word2Vec model')
+    parser.add_argument('--fix-word2vec', action='store_true', help='Fix Word2Vec encoding issues')
     
-    # 模型选择
-    parser.add_argument('--model', choices=['nb', 'svm', 'rf', 'dt', 'all'], default='all', help='选择模型')
-    parser.add_argument('--type', choices=['multi', 'ovo', 'ovr', 'all'], default='multi', help='分类类型')
-    parser.add_argument('--ngram', type=int, choices=[1, 2, 3], default=1, help='N-gram范围')
-    parser.add_argument('--kfold', action='store_true', help='使用K折交叉验证')
-    parser.add_argument('--word2vec', action='store_true', help='使用Word2Vec特征')
+    # Model selection
+    parser.add_argument('--model', choices=['nb', 'svm', 'rf', 'dt', 'all'], default='all', help='Select model')
+    parser.add_argument('--type', choices=['multi', 'ovo', 'ovr', 'all'], default='multi', help='Classification type')
+    parser.add_argument('--ngram', type=int, choices=[1, 2, 3], default=1, help='N-gram range')
+    parser.add_argument('--kfold', action='store_true', help='Use K-fold cross-validation')
+    parser.add_argument('--word2vec', action='store_true', help='Use Word2Vec features')
     
-    # 二分类测试
-    parser.add_argument('--binary-test', choices=['comprehensive', 'specific'], help='运行二分类测试')
-    parser.add_argument('--test-model', choices=['MultinomialNB', 'SVM', 'RandomForest', 'DecisionTree'], help='测试模型')
-    parser.add_argument('--test-feature', choices=['TF-IDF', 'Word2Vec'], help='测试特征')
-    parser.add_argument('--test-strategy', choices=['ovo', 'ovr'], help='测试策略')
+    # Binary classification test
+    parser.add_argument('--binary-test', choices=['comprehensive', 'specific'], help='Run binary classification test')
+    parser.add_argument('--test-model', choices=['MultinomialNB', 'SVM', 'RandomForest', 'DecisionTree'], help='Test model')
+    parser.add_argument('--test-feature', choices=['TF-IDF', 'Word2Vec'], help='Test feature')
+    parser.add_argument('--test-strategy', choices=['ovo', 'ovr'], help='Test strategy')
     
     args = parser.parse_args()
     
-    # 执行功能
+    # Execute functions
     if args.setup_word2vec:
         setup_word2vec()
     

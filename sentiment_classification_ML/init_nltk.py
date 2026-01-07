@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-初始化NLTK数据下载脚本
+Initialize NLTK data download script
 """
 
 import nltk
@@ -15,20 +15,20 @@ else:
     ssl._create_default_https_context = _create_unverified_https_context
 
 def download_nltk_data():
-    """下载必要的NLTK数据"""
+    """Download necessary NLTK data"""
     datasets = ['stopwords', 'punkt_tab', 'punkt', 'wordnet']
     
     for dataset in datasets:
-        print(f"正在下载NLTK {dataset}数据...")
+        print(f"Downloading NLTK {dataset} data...")
         try:
             nltk.download(dataset, quiet=True)
-            print(f"NLTK {dataset}数据下载完成!")
+            print(f"NLTK {dataset} data download completed!")
         except Exception as e:
-            print(f"下载{dataset}失败: {e}")
-            # 继续下载其他数据集
+            print(f"Download {dataset} failed: {e}")
+            # Continue downloading other datasets
             continue
     
-    print("所有NLTK数据下载完成!")
+    print("All NLTK data download completed!")
     return True
 
 if __name__ == "__main__":

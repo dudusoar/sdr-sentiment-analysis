@@ -1,16 +1,16 @@
 # coding: utf-8
 '''
 filename: test_binary_framework.py
-function: 测试二分类框架功能
+function: Test binary classification framework functionality
 '''
 
 from src.binary_classification_framework import run_specific_test, run_comprehensive_binary_test
 from src.word2vec_downloader import load_word2vec_model
 
 def test_basic_functionality():
-    """测试基础功能"""
+    """Test basic functionality"""
     print("="*60)
-    print("测试1: 朴素贝叶斯 + TF-IDF + OVO策略")
+    print("Test 1: Naive Bayes + TF-IDF + OVO strategy")
     print("="*60)
     
     try:
@@ -23,32 +23,32 @@ def test_basic_functionality():
             word2vec_model=None
         )
         
-        print("✓ 测试成功!")
-        print(f"平均ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
+        print("✓ Test successful!")
+        print(f"Average ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
         
         for i, (name, auc) in enumerate(zip(results['dataset_names'], results['roc_aucs'])):
             print(f"  {name}: {auc:.4f}")
         
     except Exception as e:
-        print(f"✗ 测试失败: {e}")
+        print(f"✗ Test failed: {e}")
         import traceback
         traceback.print_exc()
 
 def test_word2vec_functionality():
-    """测试Word2Vec功能"""
+    """Test Word2Vec functionality"""
     print("\n" + "="*60)
-    print("测试2: SVM + Word2Vec + OVO策略")
+    print("Test 2: SVM + Word2Vec + OVO strategy")
     print("="*60)
     
     try:
-        # 加载Word2Vec模型
+        # Load Word2Vec model
         word2vec_model = load_word2vec_model('data')
         
         if word2vec_model is None:
-            print("✗ Word2Vec模型加载失败，跳过此测试")
+            print("✗ Word2Vec model loading failed, skipping this test")
             return
         
-        print("✓ Word2Vec模型加载成功")
+        print("✓ Word2Vec model loaded successfully")
         
         results = run_specific_test(
             model_name='SVM',
@@ -59,21 +59,21 @@ def test_word2vec_functionality():
             word2vec_model=word2vec_model
         )
         
-        print("✓ 测试成功!")
-        print(f"平均ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
+        print("✓ Test successful!")
+        print(f"Average ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
         
         for i, (name, auc) in enumerate(zip(results['dataset_names'], results['roc_aucs'])):
             print(f"  {name}: {auc:.4f}")
             
     except Exception as e:
-        print(f"✗ 测试失败: {e}")
+        print(f"✗ Test failed: {e}")
         import traceback
         traceback.print_exc()
 
 def test_ovr_strategy():
-    """测试OVR策略"""
+    """Test OVR strategy"""
     print("\n" + "="*60)
-    print("测试3: 随机森林 + TF-IDF + OVR策略")
+    print("Test 3: Random Forest + TF-IDF + OVR strategy")
     print("="*60)
     
     try:
@@ -86,30 +86,30 @@ def test_ovr_strategy():
             word2vec_model=None
         )
         
-        print("✓ 测试成功!")
-        print(f"平均ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
+        print("✓ Test successful!")
+        print(f"Average ROC-AUC: {sum(results['roc_aucs'])/len(results['roc_aucs']):.4f}")
         
         for i, (name, auc) in enumerate(zip(results['dataset_names'], results['roc_aucs'])):
             print(f"  {name}: {auc:.4f}")
             
     except Exception as e:
-        print(f"✗ 测试失败: {e}")
+        print(f"✗ Test failed: {e}")
         import traceback
         traceback.print_exc()
 
 def test_comprehensive_framework():
-    """测试完整框架（小规模）"""
+    """Test complete framework (small scale)"""
     print("\n" + "="*60)
-    print("测试4: 完整框架测试（小规模）")
+    print("Test 4: Complete framework test (small scale)")
     print("="*60)
     
     try:
-        # 加载Word2Vec模型
+        # Load Word2Vec model
         word2vec_model = load_word2vec_model('data')
         
-        print("开始运行小规模完整测试...")
+        print("Starting small-scale complete test...")
         
-        # 这里我们只测试一小部分配置
+        # Here we only test a small subset of configurations
         from src.binary_classification_framework import BinaryClassificationFramework
         from sklearn.naive_bayes import MultinomialNB
         from sklearn.svm import SVC
@@ -118,7 +118,7 @@ def test_comprehensive_framework():
         
         framework = BinaryClassificationFramework()
         
-        # 简化的模型配置
+        # Simplified model configurations
         model_configs = {
             'MultinomialNB': {
                 'model': MultinomialNB(),
@@ -130,7 +130,7 @@ def test_comprehensive_framework():
             }
         }
         
-        # 简化的特征配置
+        # Simplified feature configurations
         feature_configs = {
             'TF-IDF_1gram': {
                 'vectorizer': TfidfVectorizer(ngram_range=(1,1))
@@ -142,42 +142,42 @@ def test_comprehensive_framework():
                 'vectorizer': Word2VecVectorizer(word2vec_model, bow='avg', shift_to_positive=False)
             }
         
-        # 运行测试（只测试OVO策略）
+        # Run test (only test OVO strategy)
         all_results = framework.test_model_comprehensive(
             model_configs, feature_configs, strategy='ovo'
         )
         
-        # 找出最优配置
+        # Find best configurations
         best_configs = framework.find_best_configurations(all_results)
         
-        print("✓ 完整框架测试成功!")
-        print(f"OVO策略最优配置: {best_configs['ovo']['config']}")
-        print(f"最优ROC-AUC: {best_configs['ovo']['roc_auc']:.4f}")
+        print("✓ Complete framework test successful!")
+        print(f"OVO strategy best configuration: {best_configs['ovo']['config']}")
+        print(f"Best ROC-AUC: {best_configs['ovo']['roc_auc']:.4f}")
         
     except Exception as e:
-        print(f"✗ 测试失败: {e}")
+        print(f"✗ Test failed: {e}")
         import traceback
         traceback.print_exc()
 
 if __name__ == "__main__":
-    print("开始测试二分类框架...")
+    print("Starting binary classification framework testing...")
     
-    # 运行所有测试
+    # Run all tests
     test_basic_functionality()
     test_word2vec_functionality() 
     test_ovr_strategy()
     test_comprehensive_framework()
     
     print("\n" + "="*60)
-    print("所有测试完成!")
+    print("All tests completed!")
     print("="*60)
     
-    print("\n二分类框架功能验证:")
-    print("✓ OVO策略 (一对一)")
-    print("✓ OVR策略 (一对多)")  
-    print("✓ TF-IDF特征提取")
-    print("✓ Word2Vec特征提取")
-    print("✓ 多种机器学习模型")
-    print("✓ 过采样/不过采样")
-    print("✓ 完整测试框架")
-    print("\n🎉 测试代码中的二分类框架已成功还原到新代码中！") 
+    print("\nBinary classification framework functionality verification:")
+    print("✓ OVO strategy (one-vs-one)")
+    print("✓ OVR strategy (one-vs-rest)")  
+    print("✓ TF-IDF feature extraction")
+    print("✓ Word2Vec feature extraction")
+    print("✓ Multiple machine learning models")
+    print("✓ Oversampling/non-oversampling")
+    print("✓ Complete testing framework")
+    print("\n🎉 Binary classification framework in test code has been successfully restored to new code!") 

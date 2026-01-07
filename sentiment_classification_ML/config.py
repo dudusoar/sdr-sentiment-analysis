@@ -1,26 +1,26 @@
 # coding: utf-8
 '''
 filename: config.py
-function: 集中管理配置参数
+function: Centralized configuration parameter management
 '''
 
 import os
 import string
 from nltk.corpus import stopwords
 
-# 路径配置
+# Path Configuration
 DATA_DIR = 'data'
 RESULTS_DIR = 'results'
 DATASET_DIR = os.path.join(RESULTS_DIR, 'dataset')
 WORD_FREQ_DIR = os.path.join(RESULTS_DIR, 'word_frequency_results')
 
-# 数据文件
+# Data Files
 COMBINED_COMMENTS_FILE = os.path.join(DATA_DIR, 'combined_comments.xlsx')
 SELECTED_COMMENTS_FILE = os.path.join(RESULTS_DIR, 'selected_comments.xlsx')
 WORD2VEC_MODEL_PATH = os.path.join(DATA_DIR, 'GoogleNews-vectors-negative300.bin')
 
-# 预处理配置
-# 定义需要替换的缩写形式及其对应的全称形式
+# Preprocessing Configuration
+# Define contractions to be replaced and their corresponding full forms
 CONTRACTIONS = {
     # n't
     "didn't": "did not",
@@ -40,7 +40,7 @@ CONTRACTIONS = {
     "shouldn't": "should not",
     "mightn't": "might not",
     "mustn't": "must not",
-    # be动词
+    # 're (be verb)
     "we're": "we are",
     "you're": "you are",
     "they're": "they are",
@@ -53,7 +53,7 @@ CONTRACTIONS = {
     "you've": "you have",
     "they've": "they have",
     "I've": "I have",
-    # 其他省略形式
+    # Other informal forms
     "kinda": "kind of",
     "sorta": "sort of",
     "wanna": "want to",
@@ -66,39 +66,38 @@ CONTRACTIONS = {
     "gimme": "give me"
 }
 
-# 停用词
-STOP_WORDS = set(stopwords.words('english')).copy() | set(['\'s', 'n\'t','lol','\'m','\'re','\'d','\'ve'])
+# Stopwords
+STOP_WORDS = set(stopwords.words('english')).copy() | set(['\'s', 'n\'t', 'lol', '\'m', '\'re', '\'d', '\'ve'])
 
-# 额外需要去除的无意义词
+# Additional meaningless words to remove
 ADDITIONAL_STOP_WORDS = {'to', 'from', 'if', 'would', 'could', 'now', 'one', 'someone', 'thing', 'many', 'even', 'already', 'much'}
 
-# 添加额外的停用词
+# Add additional stop words
 STOP_WORDS.update(ADDITIONAL_STOP_WORDS)
 
-# 自定义保留词
+# Custom words to retain
 RETAIN_WORDS = {'not', 'no', 'but', 'while', 'have', 'into', 'who', 'what', 'where', 'when', 'why', 'how', 'which', 'whose'}
-# 更新停用词列表，移除保留词
+# Update the stop words list by removing the words to retain
 for word in RETAIN_WORDS:
     STOP_WORDS.discard(word)
 
-# 标点符号
-# 所有标点符号
-
-PUNCTUATION = set(string.punctuation) | set(['...','``','\'\'','’','..','....','.....','“','”'])
-# 需要保留的标点符号
-PUNCTUATION_PRESERVED = set([',','!','?','.'])
-# 需要移除的标点符号
+# Punctuation
+# All punctuation marks
+PUNCTUATION = set(string.punctuation) | set(['...', '``', '\'\'', '’', '..', '....', '.....', '“', '”'])
+# Punctuation marks to preserve
+PUNCTUATION_PRESERVED = set([',', '!', '?', '.'])
+# Punctuation marks to remove
 PUNCTUATION_REMOVED = PUNCTUATION - PUNCTUATION_PRESERVED
 
-# 模型训练配置
+# Model Training Configuration
 RANDOM_SEED = 42
 TEST_SIZE = 0.2
 K_FOLDS = 10
 
-# 创建必要的目录
+# Create necessary directories
 def create_directories():
-    """创建必要的文件夹"""
+    """Create necessary folders"""
     for directory in [DATA_DIR, RESULTS_DIR, DATASET_DIR, WORD_FREQ_DIR]:
         if not os.path.exists(directory):
             os.makedirs(directory)
-            print(f"创建目录: {directory}")
+            print(f"Directory created: {directory}")

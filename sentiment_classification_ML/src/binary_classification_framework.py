@@ -1,7 +1,7 @@
 # coding: utf-8
 '''
 filename: binary_classification_framework.py
-function: 二分类框架 - 完整还原测试代码中的二分类测试流程
+function: Binary classification framework
 '''
 
 import pandas as pd
@@ -20,21 +20,21 @@ from config import RANDOM_SEED
 import os
 
 class BinaryClassificationFramework:
-    """二分类框架 - 完整还原测试代码功能"""
+    """Binary classification framework"""
     
     def __init__(self, test_size=0.3, random_state=RANDOM_SEED):
         self.test_size = test_size
         self.random_state = random_state
         
     def create_ovo_datasets(self, data_dir='results/dataset'):
-        """生成OVO策略的数据集"""
-        print("正在生成OVO策略数据集...")
+        """Generate datasets for OVO (One-vs-One) strategy"""
+        print("Generating OVO strategy datasets...")
         
-        # OVO数据集文件列表 (一对一策略)
+        # OVO dataset file list (One-vs-One strategy)
         ovo_files = [
-            'data_01.xlsx',  # 标签0 vs 标签1
-            'data_02.xlsx',  # 标签0 vs 标签2  
-            'data_12.xlsx'   # 标签1 vs 标签2
+            'data_01.xlsx',  # Label 0 vs Label 1
+            'data_02.xlsx',  # Label 0 vs Label 2  
+            'data_12.xlsx'   # Label 1 vs Label 2
         ]
         
         datasets = []
@@ -43,32 +43,32 @@ class BinaryClassificationFramework:
         for file in ovo_files:
             file_path = os.path.join(data_dir, file)
             if os.path.exists(file_path):
-                # 去除低频词版本
+                # Version with low-frequency words removed
                 data_r = load_data(file_path, remove_punctuation=False, remove_low_frequency=True)
-                # 保留低频词版本
+                # Version with low-frequency words kept
                 data_k = load_data(file_path, remove_punctuation=False, remove_low_frequency=False)
                 
                 if data_r is not None and data_k is not None:
                     datasets.extend([data_r, data_k])
                     base_name = file.replace('.xlsx', '')
                     dataset_names.extend([f'{base_name}_r', f'{base_name}_k'])
-                    print(f"加载数据集: {file}")
+                    print(f"Loading dataset: {file}")
                 else:
-                    print(f"警告: 无法加载数据集 {file}")
+                    print(f"Warning: Cannot load dataset {file}")
             else:
-                print(f"警告: 数据集文件不存在 {file_path}")
+                print(f"Warning: Dataset file does not exist {file_path}")
         
         return datasets, dataset_names
     
     def create_ovr_datasets(self, data_dir='results/dataset'):
-        """生成OVR策略的数据集"""
-        print("正在生成OVR策略数据集...")
+        """Generate datasets for OVR (One-vs-Rest) strategy"""
+        print("Generating OVR strategy datasets...")
         
-        # OVR数据集文件列表 (一对多策略)
+        # OVR dataset file list (One-vs-Rest strategy)
         ovr_files = [
-            'data_0.xlsx',   # 标签0 vs 其他(标签1,2转为标签9)
-            'data_1.xlsx',   # 标签1 vs 其他(标签0,2转为标签9)
-            'data_2.xlsx'    # 标签2 vs 其他(标签0,1转为标签9)
+            'data_0.xlsx',   # Label 0 vs Others (labels 1,2 converted to label 9)
+            'data_1.xlsx',   # Label 1 vs Others (labels 0,2 converted to label 9)
+            'data_2.xlsx'    # Label 2 vs Others (labels 0,1 converted to label 9)
         ]
         
         datasets = []
@@ -77,81 +77,81 @@ class BinaryClassificationFramework:
         for file in ovr_files:
             file_path = os.path.join(data_dir, file)
             if os.path.exists(file_path):
-                # 去除低频词版本
+                # Version with low-frequency words removed
                 data_r = load_data(file_path, remove_punctuation=False, remove_low_frequency=True)
-                # 保留低频词版本
+                # Version with low-frequency words kept
                 data_k = load_data(file_path, remove_punctuation=False, remove_low_frequency=False)
                 
                 if data_r is not None and data_k is not None:
                     datasets.extend([data_r, data_k])
                     base_name = file.replace('.xlsx', '')
                     dataset_names.extend([f'{base_name}_r', f'{base_name}_k'])
-                    print(f"加载数据集: {file}")
+                    print(f"Loading dataset: {file}")
                 else:
-                    print(f"警告: 无法加载数据集 {file}")
+                    print(f"Warning: Cannot load dataset {file}")
             else:
-                print(f"警告: 数据集文件不存在 {file_path}")
+                print(f"Warning: Dataset file does not exist {file_path}")
         
         return datasets, dataset_names
     
     def single_train(self, comments, oversampling, clf, vectorizer, test_size):
         """
-        单次训练函数 - 完全还原测试代码逻辑
-        
+        Single training function
+
         Args:
-            comments: 数据集DataFrame
-            oversampling: 是否采用过采样
-            clf: 分类器
-            vectorizer: 特征向量化器
-            test_size: 测试集比例
-        
+            comments: Dataset DataFrame
+            oversampling: Whether to use oversampling
+            clf: Classifier
+            vectorizer: Feature vectorizer
+            test_size: Test set ratio
+
         Returns:
-            roc_auc: ROC-AUC值
-            report_text: 分类报告文本
+            roc_auc: ROC-AUC value
+            report_text: Classification report text
         """
         data = comments.copy()
         
-        # 处理TF-IDF向量化器需要的字符串格式
+        # Process string format required by TF-IDF vectorizer
         if isinstance(vectorizer, TfidfVectorizer):
-            # 将词列表转换为字符串
+            # Convert word list to string
             if 'word_list' in data.columns:
                 data['word_list'] = data['word_list'].apply(' '.join)
             elif 'f_word_list' in data.columns:
                 data['word_list'] = data['f_word_list'].apply(' '.join)
         
-        # 准备特征和标签
+        # Prepare features and labels
         X = data['word_list'] if 'word_list' in data.columns else data['f_word_list']
         y = data['label1']
         
-        # 分割训练集和测试集
+        # Split training and test sets
         X_train_raw, X_test_raw, y_train, y_test = train_test_split(
             X, y, test_size=test_size, random_state=self.random_state
         )
         
-        # 特征向量化
+        # Feature vectorization
         X_train = vectorizer.fit_transform(X_train_raw)
         X_test = vectorizer.transform(X_test_raw)
         
-        # 过采样处理 - SMOTE需要在向量化后进行
+        # Oversampling processing - SMOTE needs to be performed after vectorization
         if oversampling:
-            print('此次训练【采用】过采样')
-            print('过采样【前】的样本分布')
+            print('This training uses oversampling')
+            print('Sample distribution before oversampling')
             print(y_train.value_counts())
             print('*' * 20)
             
             smote = SMOTE(random_state=self.random_state)
             X_train, y_train = smote.fit_resample(X_train, y_train)
             
-            print('过采样【后】的样本分布')
+            print('Sample distribution after oversampling')
             print(pd.Series(y_train).value_counts())
             print('*' * 20)
         else:
-            print('此次训练【没有采用】过采样')
-            print('样本分布')
+            print('This training does not use oversampling')
+            print('Sample distribution')
             print(y_train.value_counts())
             print('*' * 20)
         
-        # 训练模型
+        # Train model
         clf.fit(X_train, y_train)
         
         # 预测
@@ -168,19 +168,19 @@ class BinaryClassificationFramework:
     
     def binary_train(self, datasets, datasets_names, oversampling, clf, vectorizer, test_size):
         """
-        二分类训练框架 - 完全还原测试代码逻辑
-        
+        Binary classification training framework
+
         Args:
-            datasets: 数据集列表
-            datasets_names: 数据集名称列表
-            oversampling: 是否采用过采样
-            clf: 分类器
-            vectorizer: 特征向量化器
-            test_size: 测试集比例
-        
+            datasets: Dataset list
+            datasets_names: Dataset names list
+            oversampling: Whether to use oversampling
+            clf: Classifier
+            vectorizer: Feature vectorizer
+            test_size: Test set ratio
+
         Returns:
-            roc_auc_values: ROC-AUC值列表
-            report_texts: 分类报告文本列表
+            roc_auc_values: ROC-AUC values list
+            report_texts: Classification report texts list
         """
         roc_auc_values = []
         report_texts = []
@@ -189,20 +189,20 @@ class BinaryClassificationFramework:
             dataset = datasets[i]
             dataset_name = datasets_names[i]
             
-            print(f"\n========== 训练 {dataset_name} ==========")
+            print(f"\n========== Training {dataset_name} ==========")
             
-            # 单次训练
+            # Single training
             roc_auc, report_text = self.single_train(
                 dataset, oversampling, clf, vectorizer, test_size
             )
             
-            # 打印结果
-            print(f'{dataset_name}的roc_auc值是{roc_auc}')
-            print(f'{dataset_name}的分类结果是')
+            # Print results
+            print(f'ROC-AUC value for {dataset_name} is {roc_auc}')
+            print(f'Classification result for {dataset_name} is')
             print(report_text)
             print('-' * 50)
             
-            # 保存结果
+            # Save results
             roc_auc_values.append(roc_auc)
             report_texts.append(report_text)
         
@@ -210,19 +210,19 @@ class BinaryClassificationFramework:
     
     def test_model_comprehensive(self, model_configs, feature_configs, strategy='both'):
         """
-        综合测试模型 - 完整还原测试代码的测试流程
-        
+        Comprehensive test model
+
         Args:
-            model_configs: 模型配置列表
-            feature_configs: 特征配置列表
-            strategy: 策略选择 ('ovo', 'ovr', 'both')
-        
+            model_configs: Model configuration list
+            feature_configs: Feature configuration list
+            strategy: Strategy selection ('ovo', 'ovr', 'both')
+
         Returns:
-            all_results: 所有测试结果
+            all_results: All test results
         """
         all_results = {}
         
-        # 加载数据集
+        # Load datasets
         if strategy in ['ovo', 'both']:
             ovo_datasets, ovo_names = self.create_ovo_datasets()
             all_results['ovo'] = {}
@@ -316,7 +316,7 @@ class BinaryClassificationFramework:
         return best_configs
 
 def run_comprehensive_binary_test(word2vec_model=None):
-    """运行完整的二分类测试 - 完全还原测试代码功能"""
+    """运行完整的二分类测试"""
     
     print("开始运行完整的二分类测试框架...")
     
