@@ -1,7 +1,6 @@
 # YouTube-SC: YouTube Sentiment and Clustering Analysis
 
 ![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 
 ## 📋 Project Overview
@@ -402,7 +401,7 @@ We welcome contributions! Please follow these guidelines:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+*License information is pending. Please contact the project maintainers for licensing details.*
 
 ## 🙏 Acknowledgments
 
