@@ -24,8 +24,6 @@ sentiment_classification_ML/
 ├── utils.py               # Utility functions
 ├── init_nltk.py          # NLTK initialization
 ├── test_binary_framework.py  # Test scripts
-├── docs/                  # Project documentation
-│   └── README.md         # Project documentation (this file)
 ├── src/                   # Core source code
 │   ├── binary_classification_framework.py  # Binary classification framework
 │   ├── word2vec_downloader.py  # Word2Vec model management
@@ -50,8 +48,8 @@ sentiment_classification_ML/
 ### 1. Environment Setup
 
 ```bash
-# Install dependencies from project root
-pip install -r ../requirements.txt
+# Install dependencies from project root using uv
+uv pip install -r ../requirements.txt
 
 # Initialize NLTK data (first-time setup)
 python init_nltk.py
@@ -348,7 +346,7 @@ remove_low_frequency = True
    ```
    Error: ModuleNotFoundError
    Solution: Install missing dependencies
-   Command: pip install -r ../requirements.txt
+   Command: uv pip install -r ../requirements.txt
    ```
 
 4. **Path Reference Issues** (Fixed in latest version)

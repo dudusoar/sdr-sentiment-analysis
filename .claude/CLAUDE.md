@@ -34,48 +34,45 @@
 ## Project Structure
 ```
 Youtube-SC/
-├── Code/                         # Functional modules
-│   ├── sdr_clustering_analysis/  # Clustering analysis
-│   ├── sentiment_classification_ML/      # ML sentiment classification
-│   ├── sentiment_classification_Bert/    # BERT sentiment classification
-│   ├── topic_modeling/           # Topic modeling
-│   └── text_statistics/          # Text statistics (contains Chinese directory names)
+├── sdr_clustering_analysis/      # Clustering analysis
+├── sentiment_classification_ML/  # ML sentiment classification
+├── sentiment_classification_Bert/ # BERT sentiment classification
+├── topic_modeling/               # Topic modeling
+├── yearly_word_frequency/        # Yearly word frequency analysis
 ├── data/                         # Shared data directory
-│   ├── Comments/                 # Comment data
-│   │   ├── SDR_10_50_comments/   # Comments for SDR 10-50
-│   │   ├── SDR_50_100_comments/  # Comments for SDR 50-100
-│   │   └── SDR_100_1000_comments/ # Comments for SDR 100-1000
+│   ├── combined_comments.xlsx    # Comment dataset file
 │   └── Video_statistics/         # Video statistics data
 ├── .claude/                      # Claude Code configuration
 │   ├── task-board.md             # Project task management
 │   ├── bug-log.md                # Bug tracking and debugging
 │   ├── SKILLS_README.md          # Skills documentation
-│   ├── requirements.txt          # Project dependencies
-│   ├── setup-environment.bat     # Windows environment setup
-│   ├── setup-environment.sh      # Linux/Mac environment setup
-│   └── skills/                   # Custom skills
-│       ├── update-task-board/    # Task management skill
-│       ├── log-debug-issue/      # Bug logging skill
-│       └── manage-python-env/    # Python environment management skill
-└── .serena/                     # Serena AI configuration
+│   ├── CLAUDE.md                 # Project guide (this file)
+│   ├── skills/                   # Custom skills
+│   │   ├── update-task-board/    # Task management skill
+│   │   ├── log-debug-issue/      # Bug logging skill
+│   │   └── manage-python-env/    # Python environment management skill
+├── requirements.txt              # Project dependencies (unified)
+├── setup-environment.bat         # Windows environment setup
+├── setup-environment.sh          # Linux/Mac environment setup
+└── README.md                     # Main project documentation
 ```
 
 ## Entry Points
 Each module has its own main entry point:
-- `Code/sdr_clustering_analysis/main.py`
-- `Code/sentiment_classification_ML/main.py`
-- `Code/sentiment_classification_Bert/code/main.py`
-- `Code/topic_modeling/topic_modeling_analysis.py`
+- `sdr_clustering_analysis/main.py`
+- `sentiment_classification_ML/main.py`
+- `sentiment_classification_Bert/code/main.py`
+- `topic_modeling/topic_modeling_analysis.py`
 
 ## Data Flow
-Raw comment data (`data/Comments/combined_comments.xlsx`) is processed by each module, with outputs saved to respective module's `results/` directories.
+Raw comment data (`data/combined_comments.xlsx`) is processed by each module, with outputs saved to respective module's `results/` directories.
 
 ## Frequently Used Commands
 
 ### Environment Setup
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 
 # Initialize NLTK data (if needed)
 python -m nltk.downloader stopwords wordnet punkt
@@ -90,25 +87,25 @@ setup-environment.sh
 ### Module Execution
 ```bash
 # Clustering analysis
-cd Code/sdr_clustering_analysis && python main.py
+cd sdr_clustering_analysis && python main.py
 
 # ML sentiment classification
-cd Code/sentiment_classification_ML && python main.py --help
+cd sentiment_classification_ML && python main.py --help
 
 # BERT sentiment classification
-cd Code/sentiment_classification_Bert/code && python main.py --help
+cd sentiment_classification_Bert/code && python main.py --help
 
 # Topic modeling
-cd Code/topic_modeling && python topic_modeling_analysis.py
+cd topic_modeling && python topic_modeling_analysis.py
 ```
 
 ### Project Management
 ```bash
 # Clean Python cache (Windows)
-for /d /r Code %i in (__pycache__) do @if exist "%i" rmdir /s /q "%i"
+for /d /r . %i in (__pycache__) do @if exist "%i" rmdir /s /q "%i"
 
 # Count Python files
-dir /s /b Code\*.py | find /c ".py"
+dir /s /b *.py | find /c ".py"
 ```
 
 ### Custom Claude Skills

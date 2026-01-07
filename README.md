@@ -34,14 +34,14 @@ Youtube-SC/
 │   ├── src/                         # Core source code
 │   └── README.md                    # Module documentation
 ├── sentiment_classification_Bert/    # BERT-based sentiment classification
-│   └── code/                        # BERT implementation (under migration)
+│   └── code/                        # BERT implementation with LSTM/GRU layers
 ├── sdr_clustering_analysis/         # Comment clustering analysis
 │   └── main.py                      # Clustering entry point
 ├── topic_modeling/                  # Topic modeling analysis
 │   └── topic_modeling_analysis.py   # Topic modeling entry point
 ├── yearly_word_frequency/           # Yearly word frequency analysis
 ├── data/                            # Shared data directory
-│   ├── Comments/                    # Comment datasets
+│   ├── combined_comments.xlsx       # Comment dataset file
 │   └── Video_statistics/            # Video statistics
 ├── requirements.txt                 # Project dependencies (unified)
 ├── setup-environment.sh             # Linux/Mac environment setup
@@ -50,7 +50,6 @@ Youtube-SC/
 │   ├── task-board.md                # Project task management
 │   ├── bug-log.md                   # Bug tracking and debugging
 │   └── skills/                      # Custom management skills
-└── .serena/                         # Serena AI configuration
 ```
 
 ## 🛠️ Technology Stack
@@ -68,13 +67,13 @@ Youtube-SC/
 
 - **Python Version**: 3.11.12
 - **Virtual Environment Path**: `.venv/`
-- **Dependency Management Tool**: uv (recommended) or pip
+- **Dependency Management Tool**: uv
 - **Number of Installed Packages**: 138
 - **Environment Creation Date**: 2026-01-06
 
 ### Prerequisites
 - Python 3.11+ (3.11.12 recommended for optimal compatibility)
-- [uv](https://github.com/astral-sh/uv) (recommended) or pip
+- [uv](https://github.com/astral-sh/uv)
 - Git
 
 ### Installation
@@ -93,27 +92,6 @@ setup-environment.bat
 ./setup-environment.sh
 ```
 
-**Option 2: Manual Setup**
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/Youtube-SC.git
-cd Youtube-SC
-
-# Create virtual environment
-python -m venv .venv
-
-# Activate environment
-# Windows
-.venv\Scripts\activate
-# Linux/Mac
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Initialize NLTK data
-python -m nltk.downloader stopwords wordnet punkt
-```
 
 ### Activating Virtual Environment
 
@@ -151,8 +129,6 @@ Once the environment is set up, you can manage dependencies using the following 
 **View installed packages:**
 ```bash
 uv pip list
-# or with pip
-pip list
 ```
 
 **Update packages:**
@@ -165,15 +141,11 @@ uv update package_name
 **Add new packages:**
 ```bash
 uv add package_name
-# or with pip
-pip install package_name
 ```
 
 **Install from requirements.txt:**
 ```bash
 uv pip install -r requirements.txt
-# or with pip
-pip install -r requirements.txt
 ```
 
 **Key Package Versions (Current Environment):**
@@ -202,12 +174,15 @@ Comprehensive sentiment analysis system using traditional ML algorithms:
 **Optimal Configuration**: SVM + TF-IDF(1,1) + OVO strategy (ROC-AUC: 0.8946)
 
 ### 2. BERT Sentiment Classification (`sentiment_classification_Bert/`)
-**Status**: 🔄 Under Migration
+**Status**: ✅ Available
 
-Deep learning-based sentiment classification using BERT:
-- **Note**: This module is currently undergoing refactoring and migration
-- **Future**: Will provide state-of-the-art sentiment analysis using transformer models
-- **Temporary**: Use the ML sentiment classification module for production needs
+Deep learning-based sentiment classification using BERT with LSTM/GRU layers:
+- **Model**: Uses `bert-base-uncased` (English BERT model) for English YouTube comments
+- **Architecture**: BERT encoder with bidirectional LSTM/GRU layers for sequence modeling
+- **Classification**: Three-class sentiment analysis (positive, negative, neutral)
+- **Recent Fixes**: Fixed hardcoded paths, standardized label mapping, updated AdamW compatibility
+- **Training**: Supports configurable training epochs, batch sizes, and early stopping
+- **Note**: Uses pre-trained HuggingFace transformers with custom loss functions
 
 ### 3. Clustering Analysis (`sdr_clustering_analysis/`)
 **Status**: ✅ Production Ready
@@ -236,12 +211,13 @@ Quantitative analysis of text data:
 ## 🔄 Data Flow
 
 ```
-Raw Comments (data/Comments/combined_comments.xlsx)
+Raw Comments (data/combined_comments.xlsx)
         ↓
     [Processing]
         ↓
 ┌─────────────────────────────┐
 │  sentiment_classification_ML │ → Sentiment labels & analysis
+│  sentiment_classification_Bert│ → Deep learning sentiment analysis
 │  sdr_clustering_analysis    │ → Comment clusters
 │  topic_modeling             │ → Discussion topics
 │  yearly_word_frequency      │ → Statistical metrics
@@ -270,6 +246,11 @@ python main.py --binary-test comprehensive  # Run comprehensive tests
 cd ../sdr_clustering_analysis
 python main.py
 
+# BERT Sentiment Analysis
+cd ../sentiment_classification_Bert/code
+python main.py --help
+python main.py --epoches 10 --train_batch_size 32 --valid_batch_size 32
+
 # Topic Modeling
 cd ../topic_modeling
 python topic_modeling_analysis.py
@@ -286,21 +267,6 @@ python main.py --binary-test specific --test-model SVM --test-feature TF-IDF --t
 python test_binary_framework.py
 ```
 
-## 📈 Performance Highlights
-
-Based on comprehensive testing across 4 ML models and 6 binary classification tasks:
-
-| Model | Feature | Strategy | ROC-AUC | Accuracy | Notes |
-|-------|---------|----------|---------|----------|-------|
-| SVM | TF-IDF(1,1) | OVO | 0.8946 | 81% | **Recommended for production** |
-| SVM | Word2Vec | OVO | 0.8977 | 84% | Requires full 1.6GB model |
-| Naive Bayes | TF-IDF(1,1) | OVO | 0.8876 | 82% | Fastest inference |
-| Random Forest | Word2Vec | OVO | 0.8802 | 83% | Best with SMOTE oversampling |
-
-**Recommendations**:
-- **Production**: SVM + TF-IDF(1,1) + OVO strategy
-- **Fast Deployment**: Naive Bayes + TF-IDF(1,1)
-- **When Word2Vec available**: SVM + Word2Vec for best accuracy
 
 ## 🛠️ Project Management Tools
 
@@ -333,11 +299,11 @@ claude /manage-python-env
    source .venv/bin/activate
 
    # Reinstall dependencies
-   pip install -r requirements.txt
+   uv pip install -r requirements.txt
    ```
 
 2. **Missing data files**:
-   - Place `combined_comments.xlsx` in `data/Comments/` directory
+   - Place `combined_comments.xlsx` in `data/` directory
    - Run `python main.py --prepare` in sentiment_classification_ML module
 
 3. **Word2Vec download issues**:
@@ -366,7 +332,7 @@ claude /manage-python-env
 6. **Package import errors**:
    - Ensure virtual environment is activated (should see `(.venv)` in terminal prompt)
    - Reactivate environment if needed
-   - Reinstall packages: `uv pip install -r requirements.txt` or `pip install -r requirements.txt`
+   - Reinstall packages: `uv pip install -r requirements.txt`
 
 7. **Missing packages**:
    - Reinstall all dependencies: `uv pip install -r requirements.txt`
@@ -396,8 +362,6 @@ claude /manage-python-env
 2. **Installing development tools**:
    ```bash
    uv add --dev black flake8 pytest
-   # or with pip
-   pip install black flake8 pytest
    ```
 
 3. **Regular package updates**:
@@ -406,9 +370,6 @@ claude /manage-python-env
    uv update --outdated
    # Update all packages
    uv update
-   # or with pip
-   pip list --outdated
-   pip install --upgrade -r requirements.txt
    ```
 
 ### Performance Optimization

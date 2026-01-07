@@ -107,23 +107,21 @@ uv pip freeze > requirements.txt
 ### Current Project Structure
 ```
 Youtube-SC/
-├── Code/                         # Functional modules
-│   ├── sdr_clustering_analysis/  # Clustering analysis
-│   ├── sentiment_classification_ML/      # ML sentiment classification
-│   ├── sentiment_classification_Bert/    # BERT sentiment classification
-│   ├── topic_modeling/           # Topic modeling
-│   └── text_statistics/          # Text statistics
+├── sdr_clustering_analysis/      # Clustering analysis
+├── sentiment_classification_ML/  # ML sentiment classification
+├── sentiment_classification_Bert/ # BERT sentiment classification
+├── topic_modeling/               # Topic modeling
+├── yearly_word_frequency/        # Yearly word frequency analysis
 ├── data/                         # Data directory
-├── skills/                       # Newly created Skills
-│   ├── update-task-board/        # Task management
-│   ├── log-debug-issue/          # Bug logging
-│   └── manage-python-env/        # Environment management
-├── requirements.txt              # Project dependencies
-├── task-board.md                 # Task board
-├── bug-log.md                    # Bug log
-├── setup-environment.bat         # Windows environment script
-├── setup-environment.sh          # Linux/macOS environment script
-└── SKILLS_README.md              # This file
+├── .claude/                      # Claude Code configuration
+│   ├── task-board.md             # Project task management
+│   ├── bug-log.md                # Bug tracking and debugging
+│   ├── skills/                   # Custom management skills
+│   └── SKILLS_README.md          # Skills documentation
+├── requirements.txt              # Project dependencies (unified)
+├── setup-environment.bat         # Windows environment setup
+├── setup-environment.sh          # Linux/Mac environment setup
+└── README.md                     # Main project documentation
 ```
 
 ### Next Steps Recommendations

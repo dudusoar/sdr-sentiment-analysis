@@ -201,30 +201,30 @@ Git版本控制管理skill，用于代码提交、推送、分支管理和git记
 ### 项目结构
 ```
 Youtube-SC/
-├── Code/                         # 所有功能模块
-│   ├── sdr_clustering_analysis/  # 聚类分析（完整）
-│   ├── sentiment_classification_ML/      # ML情感分类（完整）
-│   ├── sentiment_classification_Bert/    # BERT情感分类（完整）
-│   ├── topic_modeling/           # 主题建模（完整）
-│   └── text_statistics/          # 文本统计（基础，已翻译为英文）
+├── sdr_clustering_analysis/      # 聚类分析（完整）
+├── sentiment_classification_ML/  # ML情感分类（完整）
+├── sentiment_classification_Bert/ # BERT情感分类（完整）
+├── topic_modeling/               # 主题建模（完整）
+├── yearly_word_frequency/        # 年度词频分析
 ├── data/                         # 共享数据目录
-├── skills/                       # 新创建的Skill
-│   ├── update-task-board/        # 任务管理Skill
-│   ├── log-debug-issue/          # Bug日志Skill
-│   ├── manage-python-env/        # Python环境管理Skill
-│   ├── git-log/                  # Git版本控制Skill
-│   └── test-modules/             # 测试模块Skill
-├── requirements.txt              # 项目依赖
-└── task-board.md                 # 本任务板文件
+├── .claude/                      # Claude Code配置
+│   ├── task-board.md             # 项目任务管理
+│   ├── bug-log.md                # Bug跟踪和调试
+│   ├── skills/                   # 自定义管理skills
+│   └── CLAUDE.md                 # 项目指南
+├── requirements.txt              # 项目依赖（统一）
+├── setup-environment.bat         # Windows环境设置
+├── setup-environment.sh          # Linux/Mac环境设置
+└── README.md                     # 主项目文档
 ```
 
 ### 运行准备
-1. **安装依赖**：`pip install -r requirements.txt`
+1. **安装依赖**：`uv pip install -r requirements.txt`
 2. **各模块运行**：
-   - 聚类分析：`cd Code/sdr_clustering_analysis && python main.py`
-   - ML情感分类：`cd Code/sentiment_classification_ML && python main.py --help`
-   - BERT情感分类：`cd Code/sentiment_classification_Bert/code && python main.py --help`
-   - 主题建模：`cd Code/topic_modeling && python topic_modeling_analysis.py`
+   - 聚类分析：`cd sdr_clustering_analysis && python main.py`
+   - ML情感分类：`cd sentiment_classification_ML && python main.py --help`
+   - BERT情感分类：`cd sentiment_classification_Bert/code && python main.py --help`
+   - 主题建模：`cd topic_modeling && python topic_modeling_analysis.py`
 
 ## 下一步
 

@@ -16,7 +16,6 @@ This project performs automated clustering analysis on YouTube comments to uncov
 sdr_clustering_analysis/
 ├── main.py                    # Main entry point for clustering pipeline
 ├── config.py                  # Configuration parameters and paths
-├── requirements.txt           # Project dependencies
 ├── README.md                  # This documentation file
 ├── data/                      # Data directory
 │   ├── combined_comments.xlsx      # Raw comment data
