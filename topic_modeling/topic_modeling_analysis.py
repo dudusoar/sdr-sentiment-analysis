@@ -112,7 +112,7 @@ def plot_keywords(lda_model, num_topics, output_dir, num_words=10, cmap='tab10')
     nrows = (num_topics + 1) // 2 if num_topics > 1 else 1
     ncols = 2 if num_topics > 1 else 1
     fig, axs = plt.subplots(nrows, ncols, figsize=(15, nrows * 5), sharey=True)
-    axs = np.ravel(axs) # 展平数组以便于索引
+    axs = np.ravel(axs) # Flatten the array to facilitate indexing
 
     for i in range(num_topics):
         topic_keywords = lda_model.show_topic(i, topn=num_words)
@@ -123,7 +123,7 @@ def plot_keywords(lda_model, num_topics, output_dir, num_words=10, cmap='tab10')
         axs[i].tick_params(axis='x', labelsize=14, rotation=45)
         axs[i].tick_params(axis='y', labelsize=12)
 
-    # 隐藏多余的子图
+    # Hide redundant subgraphs
     for i in range(num_topics, len(axs)):
         fig.delaxes(axs[i])
 
