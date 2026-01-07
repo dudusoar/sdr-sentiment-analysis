@@ -52,7 +52,7 @@ def preprocess_text_for_sbert(text,
                               lowercase=True,
                               remove_url=True,
                               remove_html=True,
-                              remove_special_chars=False, # Often SBERT handles special chars well
+                              remove_special_chars=False,  # Often SBERT handles special chars well
                               remove_digits_if_removing_specials=False,
                               normalize_space=True
                               # advanced_stopwords=False, # Example for optional advanced steps
@@ -73,9 +73,9 @@ def preprocess_text_for_sbert(text,
         text = remove_html_tags(text)
     if remove_special_chars:
         text = remove_special_characters(text, remove_digits=remove_digits_if_removing_specials)
-    # if advanced_stopwords: # Example
+    # if advanced_stopwords:  # Example
     #     text = remove_stopwords(text)
-    # if advanced_lemmatize: # Example
+    # if advanced_lemmatize:  # Example
     #     text = lemmatize_text(text)
     if normalize_space:
         text = normalize_whitespace(text)
@@ -86,61 +86,61 @@ def preprocess_dataframe(df, text_column, new_column_name='preprocessed_text'):
     Applies preprocessing to a DataFrame text column.
     """
     if text_column not in df.columns:
-        print(f"错误: 列 '{text_column}' 在DataFrame中未找到。")
-        return df # Or raise an error
+        print(f"Error: Column '{text_column}' was not found in the DataFrame.")
+        return df  # Or raise an error
 
-    print(f"开始预处理 '{text_column}' 列...")
+    print(f"Starting preprocessing for column '{text_column}'...")
     df[new_column_name] = df[text_column].apply(preprocess_text_for_sbert)
-    print(f"文本预处理完成。新列 '{new_column_name}' 已添加。")
+    print(f"Text preprocessing completed. New column '{new_column_name}' has been added.")
     return df
 
 if __name__ == '__main__':
-    print("测试 text_preprocessor.py...")
+    print("Testing text_preprocessor.py...")
 
     sample_texts = [
         "This is a Test comment with URL https://example.com and some <TAGS>!",
         "  Another   one with EXCESSIVE   whitespace and numbers 123.  ",
         "GREAT SDR! AMAZING!!! #SDR #DeliveryRobot",
-        None, # Test for non-string input
+        None,  # Test for non-string input
         "This is a clean sentence."
     ]
-    expected_outputs_basic = [ # Assuming default (minimal) preprocessing for SBERT
-        "this is a test comment with url and some !", # URLs, HTML removed, lowercase, normalized whitespace
+    expected_outputs_basic = [  # Assuming default (minimal) preprocessing for SBERT
+        "this is a test comment with url and some !",  # URLs, HTML removed, lowercase, normalized whitespace
         "another one with excessive whitespace and numbers 123.",
         "great sdr! amazing!!! #sdr #deliveryrobot",
         "",
         "this is a clean sentence."
     ]
-    
+
     # Test with default SBERT-friendly settings
-    print("\n--- 测试 SBERT 友好型预处理 (默认设置) ---")
+    print("\n--- Testing SBERT-friendly preprocessing (default settings) ---")
     for i, text in enumerate(sample_texts):
         processed = preprocess_text_for_sbert(text)
-        print(f"原始: '{text}'")
-        print(f"处理后: '{processed}'")
+        print(f"Original: '{text}'")
+        print(f"Processed: '{processed}'")
         # Basic assertion, can be made more rigorous
         # assert processed == expected_outputs_basic[i], f"Test case {i} failed with default settings."
 
     # Test with more aggressive special character removal
-    print("\n--- 测试移除特殊字符的预处理 ---")
+    print("\n--- Testing preprocessing with special character removal ---")
     expected_outputs_remove_special = [
         "this is a test comment with url and some tags",
-        "another one with excessive whitespace and numbers 123", # Digits kept by default
+        "another one with excessive whitespace and numbers 123",  # Digits kept by default
         "great sdr amazing sdr deliveryrobot",
         "",
         "this is a clean sentence"
     ]
     for i, text in enumerate(sample_texts):
         processed_spec_chars = preprocess_text_for_sbert(text, remove_special_chars=True)
-        print(f"原始: '{text}'")
-        print(f"处理后 (去特殊字符): '{processed_spec_chars}'")
+        print(f"Original: '{text}'")
+        print(f"Processed (special chars removed): '{processed_spec_chars}'")
         # Basic assertion
         # assert processed_spec_chars == expected_outputs_remove_special[i], f"Test case {i} failed with remove_special_chars=True."
 
     # Test DataFrame preprocessing
-    print("\n--- 测试 DataFrame 预处理 ---")
+    print("\n--- Testing DataFrame preprocessing ---")
     sample_df = pd.DataFrame({'original_comment': sample_texts})
     processed_df = preprocess_dataframe(sample_df, text_column='original_comment')
     print(processed_df[['original_comment', 'preprocessed_text']].head())
 
-    print("\ntext_preprocessor.py 测试完成。")
+    print("\ntext_preprocessor.py testing completed.")

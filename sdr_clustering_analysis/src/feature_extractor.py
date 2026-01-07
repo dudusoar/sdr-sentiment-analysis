@@ -4,49 +4,52 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 import pandas as pd
 from config import SBERT_MODEL_NAME, EMBEDDINGS_FILE, PREPROCESSED_COMMENTS_FILE
-from src.utils import save_pickle, load_pickle, get_device_for_sbert # Assuming get_device_for_sbert is in utils
+from src.utils import save_pickle, load_pickle, get_device_for_sbert  # Assuming get_device_for_sbert is in utils
 
 class SentenceEmbedder:
     def __init__(self, model_name=SBERT_MODEL_NAME, device=None):
         """
-        初始化句子嵌入器。
+        Initialize the sentence embedder.
         Args:
-            model_name (str): Hugging Face上SentenceTransformer的模型名称。
-            device (str, optional): 'cuda' 或 'cpu'。如果为None，则自动检测。
+            model_name (str): Name of the SentenceTransformer model on Hugging Face.
+            device (str, optional): 'cuda' or 'cpu'. If None, auto-detect.
         """
         if device is None:
-            self.device = get_device_for_sbert() # Using the utility from utils.py
+            self.device = get_device_for_sbert()  # Using the utility from utils.py
         else:
             self.device = device
-        
-        print(f"正在加载SentenceTransformer模型: {model_name} 到设备: {self.device}")
+
+        print(f"Loading SentenceTransformer model: {model_name} on device: {self.device}")
         try:
             self.model = SentenceTransformer(model_name, device=self.device)
-            print(f"模型 {model_name} 加载成功。")
+            print(f"Model {model_name} loaded successfully.")
         except Exception as e:
-            print(f"加载SentenceTransformer模型失败: {model_name}. 错误: {e}")
-            print("请确保已安装sentence-transformers库 (pip install sentence-transformers) 并且模型名称正确。")
+            print(f"Failed to load SentenceTransformer model: {model_name}. Error: {e}")
+            print("Please ensure the sentence-transformers library is installed "
+                  "(pip install sentence-transformers) and the model name is correct.")
             self.model = None
 
     def encode_sentences(self, sentences, batch_size=32, show_progress_bar=True):
         """
-        将句子列表编码为嵌入向量。
+        Encode a list of sentences into embedding vectors.
         Args:
-            sentences (list of str): 需要编码的句子列表。
-            batch_size (int):编码时的批处理大小。
-            show_progress_bar (bool): 是否显示编码进度条。
+            sentences (list of str): List of sentences to be encoded.
+            batch_size (int): Batch size during encoding.
+            show_progress_bar (bool): Whether to show the encoding progress bar.
         Returns:
-            numpy.ndarray: 句子的嵌入向量数组，如果模型未加载则返回None。
+            numpy.ndarray: Array of sentence embeddings; returns None if the model is not loaded.
         """
         if self.model is None:
-            print("错误: SentenceTransformer模型未成功加载。无法进行编码。")
+            print("Error: SentenceTransformer model was not loaded successfully. Encoding aborted.")
             return None
-        
-        if not sentences or not isinstance(sentences, (list, pd.Series)) or not all(isinstance(s, str) for s in sentences):
-            print("错误: 输入的句子应为非空字符串列表或Pandas Series。")
-            return np.array([]) # Return empty array for consistency
 
-        print(f"开始对 {len(sentences)} 条句子进行编码 (批大小: {batch_size})...")
+        if (not sentences or
+            not isinstance(sentences, (list, pd.Series)) or
+            not all(isinstance(s, str) for s in sentences)):
+            print("Error: Input sentences must be a non-empty list or Pandas Series of strings.")
+            return np.array([])  # Return empty array for consistency
+
+        print(f"Start encoding {len(sentences)} sentences (batch size: {batch_size})...")
         try:
             embeddings = self.model.encode(
                 sentences,
@@ -54,52 +57,54 @@ class SentenceEmbedder:
                 show_progress_bar=show_progress_bar,
                 convert_to_numpy=True
             )
-            print("句子编码完成。")
+            print("Sentence encoding completed.")
             return embeddings
         except Exception as e:
-            print(f"句子编码过程中发生错误: {e}")
+            print(f"An error occurred during sentence encoding: {e}")
             return None
+
 
 def get_sentence_embeddings(texts_series,
                             use_cache=True,
                             cache_filepath=EMBEDDINGS_FILE,
                             sbert_model_name=SBERT_MODEL_NAME):
     """
-    获取文本列表的句子嵌入，可选择使用缓存。
+    Obtain sentence embeddings for a list of texts, with optional caching.
     Args:
-        texts_series (pd.Series): 包含待编码文本的Pandas Series。
-        use_cache (bool): 是否尝试从缓存加载/保存嵌入。
-        cache_filepath (str): 嵌入缓存文件的路径。
-        sbert_model_name (str): SentenceTransformer模型名称。
+        texts_series (pd.Series): Pandas Series containing texts to be encoded.
+        use_cache (bool): Whether to attempt loading/saving embeddings from/to cache.
+        cache_filepath (str): Path to the embedding cache file.
+        sbert_model_name (str): Name of the SentenceTransformer model.
     Returns:
-        numpy.ndarray: 句子的嵌入向量数组。
+        numpy.ndarray: Array of sentence embeddings.
     """
     if use_cache and os.path.exists(cache_filepath):
-        print(f"尝试从缓存文件加载句子嵌入: {cache_filepath}")
+        print(f"Attempting to load sentence embeddings from cache: {cache_filepath}")
         embeddings = load_pickle(cache_filepath)
         if embeddings is not None and len(embeddings) == len(texts_series):
-            print("成功从缓存加载句子嵌入。")
+            print("Sentence embeddings successfully loaded from cache.")
             return embeddings
         else:
-            print("缓存文件无效或与当前数据量不匹配，将重新计算嵌入。")
+            print("Cache file is invalid or does not match the current data size. Recomputing embeddings.")
 
     embedder = SentenceEmbedder(model_name=sbert_model_name)
     if embedder.model is None:
-        return None # Model loading failed
+        return None  # Model loading failed
 
-    # Convert Series to list of strings for encoder
+    # Convert Series to list of strings for the encoder
     texts_list = texts_series.tolist()
     embeddings = embedder.encode_sentences(texts_list)
 
     if embeddings is not None and use_cache:
         save_pickle(embeddings, cache_filepath)
-    
+
     return embeddings
 
-if __name__ == '__main__':
-    print("测试 feature_extractor.py...")
 
-    # 准备一些示例文本 (模拟从data_loader和text_preprocessor来的输出)
+if __name__ == '__main__':
+    print("Testing feature_extractor.py...")
+
+    # Prepare some sample texts (simulating outputs from data_loader and text_preprocessor)
     sample_preprocessed_texts = pd.Series([
         "this is a test comment with url and some tags",
         "another one with excessive whitespace and numbers 123",
@@ -108,27 +113,31 @@ if __name__ == '__main__':
         "yet another comment to be embedded"
     ])
 
-    print(f"\n使用的SBERT模型: {SBERT_MODEL_NAME}")
-    
-    # 测试获取嵌入 (不使用缓存首次运行)
-    print("\n--- 测试首次获取嵌入 (不使用缓存或缓存不存在) ---")
-    # 清理可能的旧缓存文件以进行干净测试
+    print(f"\nSBERT model in use: {SBERT_MODEL_NAME}")
+
+    # Test embedding generation (first run without cache)
+    print("\n--- Testing first-time embedding generation (no cache or cache missing) ---")
+    # Remove any existing cache file for a clean test
     if os.path.exists(EMBEDDINGS_FILE):
         os.remove(EMBEDDINGS_FILE)
-        print(f"已删除旧的缓存文件: {EMBEDDINGS_FILE}")
+        print(f"Removed old cache file: {EMBEDDINGS_FILE}")
 
-    embeddings1 = get_sentence_embeddings(sample_preprocessed_texts, use_cache=True) # 会保存到缓存
+    embeddings1 = get_sentence_embeddings(sample_preprocessed_texts, use_cache=True)  # Will save to cache
     if embeddings1 is not None:
-        print(f"获取到嵌入向量，形状: {embeddings1.shape}")
-        assert embeddings1.shape == (len(sample_preprocessed_texts), SentenceEmbedder(SBERT_MODEL_NAME).model.get_sentence_embedding_dimension())
-        print("嵌入维度与模型输出维度一致。")
+        print(f"Embeddings obtained. Shape: {embeddings1.shape}")
+        assert embeddings1.shape == (
+            len(sample_preprocessed_texts),
+            SentenceEmbedder(SBERT_MODEL_NAME).model.get_sentence_embedding_dimension()
+        )
+        print("Embedding dimensions match the model output dimension.")
 
-    # 测试从缓存加载嵌入
-    if embeddings1 is not None: # Only test caching if first attempt was successful
-        print("\n--- 测试从缓存获取嵌入 ---")
+    # Test loading embeddings from cache
+    if embeddings1 is not None:  # Only test caching if first attempt was successful
+        print("\n--- Testing embedding loading from cache ---")
         embeddings2 = get_sentence_embeddings(sample_preprocessed_texts, use_cache=True)
         if embeddings2 is not None:
-            assert np.array_equal(embeddings1, embeddings2), "从缓存加载的嵌入与首次计算的不一致。"
-            print("从缓存加载的嵌入与首次计算的一致。")
+            assert np.array_equal(embeddings1, embeddings2), \
+                "Cached embeddings do not match the originally computed embeddings."
+            print("Cached embeddings are identical to the originally computed embeddings.")
 
-    print("\nfeature_extractor.py 测试完成。")
+    print("\nfeature_extractor.py testing completed.")

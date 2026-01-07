@@ -1,7 +1,7 @@
-聚类算法: KMEANS
-K值: 7
+Clustering Algorithm: KMEANS
+K value: 7
 
-评估指标:
+Evaluation Metrics:
   silhouette_score: 0.0407
   calinski_harabasz_score: 178.6426
   davies_bouldin_score: 4.2524
