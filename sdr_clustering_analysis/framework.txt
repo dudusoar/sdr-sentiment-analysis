@@ -1,0 +1,122 @@
+# SDR YouTube评论聚类分析项目 - 框架文档 (Task 2 - 更新版)
+
+## 项目目标
+- 使用无监督聚类分析YouTube评论数据，回应审稿人关于客观性的建议。
+- 探索评论的自然分组，并与手动情感标签和LDA主题模型进行关联分析。
+
+## 项目结构
+sdr_clustering_analysis/
+├── main.py                  # 主程序入口，控制整个分析流程
+├── config.py                # 配置参数 (路径、模型名称、聚类参数等)
+├── requirements.txt         # 项目依赖包 (待生成)
+├── framework.txt            # 本文件
+├── data/                    # 数据文件夹
+│   ├── combined_comments.xlsx # 原始评论数据 (用户提供)
+│   ├── preprocessed_sdr_comments.pkl # (可选) 缓存的预处理后评论数据
+│   └── sbert_embeddings_sdr.pkl    # (可选) 缓存的评论句子嵌入向量
+├── results/                 # 结果输出文件夹
+│   ├── cluster_assignments_sdr.csv # 每条评论的簇分配结果
+│   ├── cluster_evaluation_sdr.txt  # 聚类评估指标 (如轮廓系数)
+│   ├── elbow_method_plot.png       # K-Means肘部法则图
+│   ├── cluster_sentiment_crosstab_absolute.csv # 聚类与手动情感标签交叉表 (绝对值)
+│   ├── cluster_sentiment_crosstab_normalized.csv # 聚类与手动情感标签交叉表 (百分比)
+│   ├── cluster_lda_crosstab_sdr.csv # (如果分析LDA主题) 聚类与LDA主题交叉表
+│   └── cluster_profiles/         # 每个簇的详细信息 (关键词、样本评论)
+│       ├── cluster_0_profile.txt
+│       └── ...
+├── src/                     # 源代码模块
+│   ├── __init__.py
+│   ├── data_loader.py       # 数据加载与基本有效性检查
+│   ├── text_preprocessor.py # (可选的) 轻量级文本预处理
+│   ├── feature_extractor.py # 特征提取 (Sentence-BERT嵌入)
+│   ├── clustering.py        # 聚类算法实现 (K-Means) 与内部评估
+│   ├── evaluation.py        # 簇的定性分析 (关键词、样本) 与外部对比 (情感标签、LDA)
+│   └── utils.py             # 通用工具函数 (pickle存取, csv保存, 设备检测)
+└── notebooks/               # (可选) Jupyter notebooks用于探索性分析和可视化
+
+## 模块功能描述 (已实现/细化)
+
+### `src/data_loader.py`
+- 功能: 从`data/`目录加载原始评论数据 (`combined_comments.xlsx`)。
+- 检查并处理必需列 (文本、ID、情感标签)。
+- 移除文本内容为空的行。
+- 确保ID列的唯一性，若不唯一则创建 `unique_comment_id`。
+- 输出: Pandas DataFrame。
+
+### `src/text_preprocessor.py`
+- 功能: 对评论文本进行可选的轻量级预处理，适用于SBERT。
+    - 包括：转小写、移除URL、移除HTML标签、(可选)移除特殊字符、标准化空格。
+- 输入: 评论文本列表或DataFrame。
+- 输出: 预处理后的文本列表或DataFrame。
+
+### `src/feature_extractor.py`
+- 功能: 将预处理后的评论文本转换为句子嵌入向量。
+    - 使用预训练的Sentence-BERT模型 (如 `all-MiniLM-L6-v2`)。
+    - 支持GPU/CPU设备自动检测。
+    - 实现嵌入结果的缓存与加载 (pickle)。
+- 输入: 预处理后的文本列表 (Pandas Series)。
+- 输出: 句子嵌入的Numpy数组。
+
+### `src/clustering.py`
+- 功能: 应用K-Means聚类算法，并提供内部评估。
+    - `Clusterer` 类封装K-Means逻辑。
+    - `find_optimal_k_kmeans()`: 通过测试K值范围，计算惯性 (Inertia) 和轮廓系数 (Silhouette Score)，绘制肘部法则图。
+    - `kmeans_cluster()`: 执行K-Means聚类。
+    - `evaluate_clustering()`: 计算轮廓系数、Calinski-Harabasz、Davies-Bouldin等内部评估指标。
+- 输入: 句子嵌入向量。
+- 输出: 每条评论的簇标签、训练好的KMeans模型、评估指标。
+
+### `src/evaluation.py`
+- 功能: 对聚类结果进行定性和定量分析。
+    - `get_top_keywords_for_clusters()`: 为每个簇提取TF-IDF关键词。
+    - `get_sample_comments_for_clusters()`: 为每个簇抽取样本评论。
+    - `analyze_sentiment_distribution_in_clusters()`: 分析手动情感标签在各簇的分布，并生成交叉表。
+    - `save_cluster_profiles()`: 将各簇的关键词和样本评论保存到文件。
+    - (占位符) `analyze_lda_topic_distribution_in_clusters()`: 用于未来分析LDA主题在各簇的分布。
+- 输入: 簇标签、原始/预处理文本数据、(可选)手动情感标签、(可选)LDA主题。
+- 输出: 分析报告、图表、CSV文件、簇描述文件。
+
+### `src/utils.py`
+- 功能: 通用工具函数。
+    - `save_pickle`, `load_pickle`: 用于对象序列化与反序列化 (缓存)。
+    - `save_csv`: 保存DataFrame到CSV。
+    - `get_device_for_sbert`: 检测可用的计算设备 (GPU/CPU)。
+
+### `main.py`
+- 功能: 主程序入口，通过命令行参数编排整个分析流程。
+    - 加载数据 -> (可选预处理) -> 特征提取 (SBERT) -> 聚类 (K-Means，含K值选择) -> 评估与分析 (内部指标、关键词、样本、情感标签交叉分析) -> 保存所有结果。
+
+### `config.py`
+- 功能: 集中管理所有配置参数。
+    - 文件与目录路径。
+    - 数据列名映射。
+    - Sentence-BERT模型名称与设备偏好。
+    - K-Means聚类参数 (K值范围、选定K、随机种子)。
+    - 结果输出文件名。
+    - `create_project_directories()` 函数确保结果目录存在。
+
+## 分析流程 (已实现)
+1. **加载数据**: 从 `combined_comments.xlsx` 加载评论 (使用 `data_loader.py`)。
+2. **(可选) 文本预处理**: 对文本进行轻量级清理 (使用 `text_preprocessor.py`)。
+3. **文本表示**: 使用Sentence-BERT将评论转换为句子嵌入向量 (使用 `feature_extractor.py`)。
+4. **聚类**: 应用K-Means。如果未指定K，则尝试在指定范围内寻找最优K (使用 `clustering.py`)。
+5. **聚类结果解读与评估**:
+    - 计算内部评估指标 (如轮廓系数) (使用 `clustering.py`)。
+    - 提取各簇关键词和样本评论 (使用 `evaluation.py`)。
+    - 对比分析：将聚类结果与手动情感标签进行交叉分析 (使用 `evaluation.py`)。
+6. **输出结果**:
+    - 每条评论的簇分配 (`cluster_assignments_sdr.csv`)。
+    - 聚类评估指标 (`cluster_evaluation_sdr.txt`)。
+    - 肘部法则图 (`elbow_method_plot.png`)。
+    - 各簇的描述文件 (关键词、样本评论) (在 `results/cluster_profiles/` 目录下)。
+    - 聚类与情感标签的交叉表 (`cluster_sentiment_crosstab_*.csv`)。
+
+## 技术栈
+- Python 3.8+
+- pandas
+- numpy
+- scikit-learn (KMeans, TfidfVectorizer, metrics)
+- sentence-transformers (for Sentence-BERT)
+- torch (自动选择SBERT设备，由sentence-transformers依赖)
+- matplotlib (for Elbow method plot)
+- openpyxl (读取 .xlsx 文件)

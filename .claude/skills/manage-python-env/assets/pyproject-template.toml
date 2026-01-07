@@ -1,0 +1,219 @@
+[project]
+name = "project-name"
+version = "0.1.0"
+description = "Project description"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Author Name", email = "author@example.com"},
+]
+keywords = ["keyword1", "keyword2"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    # Core dependencies
+    "requests>=2.28.0",
+    "pandas>=1.5.0",
+    "numpy>=1.24.0",
+    # Add your dependencies here
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/username/project"
+Documentation = "https://project.readthedocs.io"
+Repository = "https://github.com/username/project"
+Changelog = "https://github.com/username/project/releases"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+# uv-specific configuration
+# version = "0.1.0"  # Uncomment to pin uv version
+
+# Source configuration (optional)
+# [[tool.uv.sources]]
+# name = "pypi"
+# url = "https://pypi.org/simple"
+# verify_ssl = true
+# priority = 100
+
+# [[tool.uv.sources]]
+# name = "custom"
+# url = "https://custom.pypi.org/simple"
+# verify_ssl = false
+# priority = 200
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+^/foo.py  # exclude a file named foo.py in the root of the project
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203, W503"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+    "-q",
+]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/setup.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Optional: Hatch configuration
+[tool.hatch.version]
+path = "src/project_name/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/project_name"]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pytest",
+    "pytest-cov",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "pytest --cov-report=term-missing --cov=project_name {args:tests}"
+
+[tool.hatch.envs.lint]
+detached = true
+dependencies = [
+    "black",
+    "flake8",
+    "mypy",
+]
+[tool.hatch.envs.lint.scripts]
+black = "black --check --diff {args:src tests}"
+flake8 = "flake8 {args:src tests}"
+mypy = "mypy {args:src}"
+all = ["black", "flake8", "mypy"]
+
+# Optional: pre-commit configuration
+[tool.pre-commit]
+default_install_hook_types = ["pre-commit", "pre-push"]
+default_stages = ["commit", "push"]
+
+[[tool.pre-commit.hooks]]
+id = "black"
+args = ["--safe"]
+
+[[tool.pre-commit.hooks]]
+id = "flake8"
+
+[[tool.pre-commit.hooks]]
+id = "mypy"
+additional_dependencies = ["types-requests", "types-python-dateutil"]
+
+[[tool.pre-commit.hooks]]
+id = "pre-commit-hooks"
+args = ["--hook-stage", "push", "--allow-missing-config"]
+
+# Optional: tox configuration
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py38,py39,py310,py311
+isolated_build = true
+
+[testenv]
+deps =
+    pytest
+    pytest-cov
+commands =
+    pytest {posargs:tests}
+"""

@@ -1,0 +1,12 @@
+--- Cluster 1 Profile ---
+
+Top Keywords:
+robot, robots, delivery, people, like, just, food, cute, jobs, human
+
+Sample Comments:
+  Sample 1: Doordash has allowed me and my wife to finally pay the bills and now robots are taking that job to…
+  Sample 2: What a copy! Check Starship robot.
+  Sample 3: There were alot of times where my delivery guy was late/lazy/a deadbeat gangbanger or stoner and I'd rather people like that not deliver my food. I'm ok with robots replacing those people, this is of course my opinion
+  Sample 4: So the people getting some exercise and saving some money by visiting the cafe in person will have their orders put on hold when someone orders with the robot? Money certainly talks!
+  Sample 5: Comber umm actually no. If the robot gets stuck for example in this situation a person who is monitoring the robots will take control and will bring it back to it's path, then it will resume it's autonomous drive again.
+

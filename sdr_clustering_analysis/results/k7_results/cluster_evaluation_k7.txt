@@ -1,0 +1,9 @@
+聚类算法: KMEANS
+K值: 7
+
+评估指标:
+  silhouette_score: 0.0407
+  calinski_harabasz_score: 178.6426
+  davies_bouldin_score: 4.2524
+  num_clusters_effective: 7.0000
+  num_noise_points: 0.0000

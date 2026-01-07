@@ -1,0 +1,60 @@
+sentiment_classification_ML/
+├── config.py                # 配置参数
+├── main.py                  # 主入口
+├── utils.py                 # 通用工具
+├── data/                    # 数据文件夹 
+│   ├── GoogleNews-vectors-negative300.bin  # Word2Vec模型
+│   └── combined_comments.xlsx  # 原始评论数据
+├── results/                 # 结果输出文件夹
+│   ├── dataset/            # OVO/OVR数据集
+│   └── word_frequency_results/  # 词频分析结果
+├── src/                     # 源代码
+│   ├── data_manager.py      # 数据管理
+│   ├── preprocessing.py     # 文本预处理
+│   ├── vectorizers.py       # 文本向量化(TF-IDF + Word2Vec)
+│   ├── model_training.py    # 模型训练
+│   ├── evaluation.py        # 模型评估
+│   ├── visualization.py     # 结果可视化
+│   ├── binary_classification_framework.py  # 二分类框架
+│   └── word2vec_downloader.py  # Word2Vec管理(已修复)
+├── docs/                    # 文档系统
+│   ├── README.md           # 项目说明
+│   ├── model_performance.md # 性能分析
+│   ├── test_results.md     # 测试结果
+│   └── functionality_comparison.md  # 功能对比
+└── notebooks/               # Jupyter笔记本
+    └── word2vec_tutorial.ipynb  # Word2Vec教程
+
+# 模块状态说明
+✅ 已完成模块:
+- 二分类框架 (OVO/OVR策略)
+- Word2Vec管理 (含智能降级机制)
+- 特征提取 (TF-IDF + Word2Vec)
+- 模型训练与评估
+- 文档系统
+
+🔄 待实现模块:
+- 聚类分析 (K-means/DBSCAN)
+- 聚类验证框架
+- 可视化增强
+
+# 关键功能说明
+1. 二分类框架:
+   - OVO策略: 一对一分类
+   - OVR策略: 一对多分类
+   - 支持SVM、朴素贝叶斯、随机森林等模型
+
+2. 特征工程:
+   - TF-IDF: 1-3gram特征
+   - Word2Vec: 300维向量(已修复)
+   - 智能降级机制确保系统稳定性
+
+3. 评估体系:
+   - ROC-AUC、准确率、F1分数
+   - 混淆矩阵分析
+   - 性能对比报告
+
+4. 数据处理:
+   - 4,971条YouTube评论
+   - 三分类标签(消极/积极/中性)
+   - 完整的预处理流程
