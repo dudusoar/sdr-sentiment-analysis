@@ -15,7 +15,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from gensim.models import KeyedVectors
 
-from config import create_directories, WORD_FREQ_DIR, DATASET_DIR, COMBINED_COMMENTS_FILE, SELECTED_COMMENTS_FILE, WORD2VEC_MODEL_PATH
+from config import create_directories, WORD_FREQ_DIR, DATASET_DIR, COMBINED_COMMENTS_FILE, SELECTED_COMMENTS_FILE, WORD2VEC_MODEL_PATH, DATA_DIR
 from src.data_manager import filter_selected_comments, create_ovo_datasets, create_ovr_datasets, load_data, load_training_datasets
 from src.preprocessing import first_preprocessing, second_preprocessing
 from src.vectorizers import Word2VecVectorizer
@@ -30,48 +30,52 @@ def setup_word2vec():
     print("Setting up Word2Vec model...")
     
     # Try to download the model
-    success = download_word2vec_model('data', method='auto')
+    success = download_word2vec_model(DATA_DIR, method='auto')
     
     if success:
         # Verify model can be loaded properly
-        model = load_word2vec_model('data')
+        model = load_word2vec_model(DATA_DIR)
         if model is not None:
-            print(f"✅ Word2Vec model setup successful!")
-            print(f"📊 Vocabulary size: {len(model.key_to_index)}")
-            print(f"📏 Vector dimension: {model.vector_size}")
+            print(f"[OK] Word2Vec model setup successful!")
+            print(f"Vocabulary size: {len(model.key_to_index)}")
+            print(f"Vector dimension: {model.vector_size}")
             return True
         else:
-            print("❌ Word2Vec model downloaded but failed to load")
+            print("[ERROR] Word2Vec model downloaded but failed to load")
             return False
     else:
-        print("❌ Word2Vec model setup failed")
+        print("[ERROR] Word2Vec model setup failed")
         return False
 
 def fix_word2vec():
     """Fix Word2Vec encoding issues"""
-    print("🔧 Starting to fix Word2Vec encoding issues...")
-    return fix_word2vec_encoding('data')
+    print("[FIX] Starting to fix Word2Vec encoding issues...")
+    return fix_word2vec_encoding(DATA_DIR)
 
 def prepare_data():
     """Prepare data"""
     print("Starting data preparation...")
-    
+
     # Create necessary directories
     create_directories()
-    
+
     # Filter selected comments
     print("Filtering selected comments...")
-    filter_selected_comments(COMBINED_COMMENTS_FILE, SELECTED_COMMENTS_FILE)
-    
+    selected_comments = filter_selected_comments(COMBINED_COMMENTS_FILE, SELECTED_COMMENTS_FILE)
+
+    if selected_comments is None:
+        print("❌ Failed to filter selected comments")
+        return
+
     # Create OVO dataset
     print("Creating OVO dataset...")
-    create_ovo_datasets(SELECTED_COMMENTS_FILE, DATASET_DIR)
-    
+    create_ovo_datasets(selected_comments)
+
     # Create OVR dataset
     print("Creating OVR dataset...")
-    create_ovr_datasets(SELECTED_COMMENTS_FILE, DATASET_DIR)
-    
-    print("✅ Data preparation complete")
+    create_ovr_datasets(selected_comments)
+
+    print("[OK] Data preparation complete")
 
 def analyze_data():
     """Analyze data"""

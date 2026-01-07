@@ -1,7 +1,7 @@
 # coding: utf-8
 '''
 filename: visualization.py
-function: 结果可视化，词频统计和词云图绘制
+function: Results visualization, word frequency statistics, and word cloud generation
 '''
 
 from collections import Counter
@@ -16,45 +16,45 @@ from utils import ensure_directory, save_excel
 
 def word_count(docs, file_name, threshold=0):
     '''
-    计算词频并保存结果
+    Calculate word frequency and save results
     
     Args:
-        docs: 单词列表的列表
-        file_name: 保存的文件名
-        threshold: 词频阈值，只保留词频大于threshold的词
+        docs: List of word lists
+        file_name: File name to save
+        threshold: Frequency threshold, only keep words with frequency greater than threshold
     
     Returns:
-        word_frequency_df: 包含词频统计的DataFrame
+        word_frequency_df: DataFrame containing word frequency statistics
     '''
     ensure_directory(WORD_FREQ_DIR)
     file_path = os.path.join(WORD_FREQ_DIR, file_name)
     
-    # 统计词频
+    # Count word frequency
     words_list = [word for row in docs for word in row]
     word_counts = Counter(words_list)
     word_counts_dict = dict(word_counts)
     sorted_word_counts = sorted(word_counts_dict.items(), key=lambda x: x[1], reverse=True)
 
-    # 转化为dataframe
+    # Convert to dataframe
     word_frequency_df = pd.DataFrame(sorted_word_counts, columns=['word', 'frequency'])
     
-    # 筛选词频大于阈值的词
+    # Filter words with frequency greater than threshold
     index = word_frequency_df['frequency'] > threshold
     word_frequency_df = word_frequency_df[index]
     
-    # 保存结果
+    # Save results
     save_excel(word_frequency_df, file_path)
-    print(f'词频统计已保存到: {file_path}')
+    print(f'Word frequency statistics saved to: {file_path}')
 
     return word_frequency_df
 
 def generate_word_cloud(words, picture_name):
     '''
-    生成词云图并保存
+    Generate word cloud and save
     
     Args:
-        words: 词频字典，键为词，值为频率
-        picture_name: 保存的图片名称
+        words: Word frequency dictionary, keys are words, values are frequencies
+        picture_name: Picture name to save
     
     Returns:
         None
@@ -62,15 +62,15 @@ def generate_word_cloud(words, picture_name):
     ensure_directory(WORD_FREQ_DIR)
     picture_path = os.path.join(WORD_FREQ_DIR, picture_name)
     
-    # 创建WordCloud对象
+    # Create WordCloud object
     wordcloud = WordCloud(width=800, height=400, background_color='white')
-    # 根据词频生成词云
+    # Generate word cloud based on word frequency
     wordcloud.generate_from_frequencies(frequencies=words)
-    # 保存词云
+    # Save word cloud
     wordcloud.to_file(picture_path)
-    print(f'词云图已保存到: {picture_path}')
+    print(f'Word cloud image saved to: {picture_path}')
 
-    # 使用matplotlib来显示词云
+    # Display word cloud using matplotlib
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
@@ -79,24 +79,24 @@ def generate_word_cloud(words, picture_name):
 
 def analyze_word_frequency(comments, output_dir=WORD_FREQ_DIR):
     '''
-    分析词频并生成词云图
+    Analyze word frequency and generate word clouds
     
     Args:
-        comments: 包含评论数据的DataFrame
-        output_dir: 输出目录
+        comments: DataFrame containing comment data
+        output_dir: Output directory
     
     Returns:
         None
     '''
     ensure_directory(output_dir)
     
-    # 总的词频统计
+    # Overall word frequency statistics
     word_frequency_df = word_count(comments['f_word_list'], file_name='word_frequency.xlsx', threshold=0)
     
-    # 保存词频大于1的词
+    # Save words with frequency > 1
     word_frequency_df_small = word_count(comments['f_word_list'], file_name='word_frequency_small.xlsx', threshold=1)
     
-    # 按标签统计词频
+    # Count word frequency by label
     for label in [0, 1, 2]:
         index = comments['label1'] == label
         word_frequency_df_label = word_count(
@@ -105,16 +105,16 @@ def analyze_word_frequency(comments, output_dir=WORD_FREQ_DIR):
             threshold=0
         )
     
-    # 生成词云图
-    # 总词频对应的词云
+    # Generate word clouds
+    # Overall word frequency word cloud
     words = word_frequency_df.set_index('word').to_dict()['frequency']
     generate_word_cloud(words, picture_name='wordcloud.png')
     
-    # 词频大于1的词云
+    # Word cloud for words with frequency > 1
     words_small = word_frequency_df_small.set_index('word').to_dict()['frequency']
     generate_word_cloud(words_small, picture_name='wordcloud_small.png')
     
-    # 按标签生成词云
+    # Generate word clouds by label
     for label in [0, 1, 2]:
         index = comments['label1'] == label
         word_frequency_df_label = word_count(
@@ -127,12 +127,12 @@ def analyze_word_frequency(comments, output_dir=WORD_FREQ_DIR):
 
 def plot_model_performance(results, model_names, metrics=None):
     '''
-    绘制模型性能比较图
+    Plot model performance comparison
     
     Args:
-        results: 包含各个模型评估结果的列表
-        model_names: 模型名称列表
-        metrics: 需要绘制的指标列表，默认为['accuracy', 'precision', 'recall', 'f1-score']
+        results: List containing evaluation results for each model
+        model_names: List of model names
+        metrics: List of metrics to plot, default is ['accuracy', 'precision', 'recall', 'f1-score']
     
     Returns:
         None
@@ -140,7 +140,7 @@ def plot_model_performance(results, model_names, metrics=None):
     if metrics is None:
         metrics = ['accuracy', 'precision', 'recall', 'f1-score']
     
-    # 提取结果
+    # Extract results
     metric_values = {metric: [] for metric in metrics}
     
     for result in results:
@@ -148,11 +148,11 @@ def plot_model_performance(results, model_names, metrics=None):
             if metric == 'accuracy':
                 metric_values[metric].append(result['accuracy'])
             else:
-                # 计算各个类别的平均值
+                # Calculate average for each class
                 values = [result[str(label)][metric] for label in [0, 1, 2] if str(label) in result]
                 metric_values[metric].append(np.mean(values))
     
-    # 绘图
+    # Plot
     fig, axes = plt.subplots(len(metrics), 1, figsize=(10, 3*len(metrics)))
     
     if len(metrics) == 1:
@@ -164,7 +164,7 @@ def plot_model_performance(results, model_names, metrics=None):
         axes[i].set_ylim(0, 1)
         axes[i].set_ylabel(metric.capitalize())
         
-        # 添加数值标签
+        # Add value labels
         for j, v in enumerate(metric_values[metric]):
             axes[i].text(j, v + 0.02, f'{v:.4f}', ha='center')
     

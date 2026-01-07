@@ -7,7 +7,7 @@ function: Data loading, preprocessing, and splitting
 import pandas as pd
 import os
 from src.preprocessing import first_preprocessing, second_preprocessing, remove_low_frequency_words
-from config import DATASET_DIR, SELECTED_COMMENTS_FILE
+from config import DATASET_DIR, SELECTED_COMMENTS_FILE, COMBINED_COMMENTS_FILE
 from utils import save_excel, load_excel, ensure_directory
 
 def load_data(file_name=SELECTED_COMMENTS_FILE, remove_punctuation=True, remove_low_frequency=True, low_frequency_words=None):
@@ -140,7 +140,7 @@ def create_datasets():
     Main function: Create all datasets
     '''
     # Filter data
-    selected_comments = filter_selected_comments('combined_comments.xlsx')
+    selected_comments = filter_selected_comments(COMBINED_COMMENTS_FILE)
     if selected_comments is None:
         print("Cannot load original data file")
         return

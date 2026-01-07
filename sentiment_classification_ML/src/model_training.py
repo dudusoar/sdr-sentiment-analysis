@@ -148,41 +148,41 @@ def single_train(comments, clf, vectorizer=None, test_size=TEST_SIZE, oversampli
     # Test model
     y_pred = clf.predict(X_test)
     
-    # 获取预测概率
+    # Get prediction probabilities
     if hasattr(clf, 'predict_proba'):
         y_pred_proba = clf.predict_proba(X_test)
     else:
         y_pred_proba = None
     
-    # 打印分类结果
+    # Print classification results
     report_dict = print_classification_results(y_test, y_pred, y_pred_proba)
     
     return report_dict
 
 def binary_train(datasets, datasets_names, clf, vectorizer=None, test_size=TEST_SIZE, oversampling=False):
     '''
-    在多个二分类数据集上训练模型
+    Train models on multiple binary classification datasets
     
     Args:
-        datasets: 数据集列表
-        datasets_names: 数据集名称列表
-        clf: 分类器
-        vectorizer: 特征向量化器
-        test_size: 测试集比例
-        oversampling: 是否使用过采样
+        datasets: List of datasets
+        datasets_names: List of dataset names
+        clf: Classifier
+        vectorizer: Feature vectorizer
+        test_size: Test set ratio
+        oversampling: Whether to use oversampling
     
     Returns:
-        results: 包含各个数据集评估结果的列表
-        result_names: 结果名称列表
+        results: List containing evaluation results for each dataset
+        result_names: List of result names
     '''
-    # 保存结果
+    # Save results
     results = []
     
     for i, dataset in enumerate(datasets):
         dataset_name = datasets_names[i]
-        print(f"\n====== 在{dataset_name}上训练 ======")
+        print(f"\n====== Training on {dataset_name} ======")
         
-        # 训练并评估模型
+        # Train and evaluate model
         report_dict = single_train(
             dataset, 
             clf=clf, 

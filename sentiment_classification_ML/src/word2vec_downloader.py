@@ -1,7 +1,7 @@
 # coding: utf-8
 '''
 filename: word2vec_downloader.py
-function: Word2Vec模型下载和管理
+function: Word2Vec model download and management
 '''
 
 import os
@@ -12,51 +12,51 @@ from gensim.models import KeyedVectors
 import zipfile
 
 class Word2VecDownloader:
-    """Word2Vec模型下载器"""
+    """Word2Vec model downloader"""
     
     def __init__(self, model_dir='data'):
         self.model_dir = model_dir
         self.model_path = os.path.join(model_dir, 'GoogleNews-vectors-negative300.bin')
         
-        # 确保目录存在
+        # Ensure directory exists
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
     
     def check_model_exists(self):
-        """检查模型文件是否存在"""
+        """Check if model file exists"""
         return os.path.exists(self.model_path)
     
     def verify_model_integrity(self):
-        """验证模型文件完整性"""
+        """Verify model file integrity"""
         if not self.check_model_exists():
             return False
         
         try:
-            # 检查文件大小 (GoogleNews模型应该约为1.6GB)
+            # Check file size (GoogleNews model should be about 1.6GB)
             file_size = os.path.getsize(self.model_path)
-            if file_size < 1000000000:  # 小于1GB说明下载不完整
-                print(f"模型文件大小异常: {file_size} bytes (期望 > 1GB)")
+            if file_size < 1000000000:  # Less than 1GB indicates incomplete download
+                print(f"Model file size abnormal: {file_size} bytes (expected > 1GB)")
                 return False
             
-            # 尝试读取文件头部
+            # Try to read file header
             with open(self.model_path, 'rb') as f:
                 header = f.read(100)
                 if len(header) < 10:
-                    print("模型文件头部读取失败")
+                    print("Model file header read failed")
                     return False
             
-            print(f"模型文件完整性检查通过: {file_size} bytes")
+            print(f"Model file integrity check passed: {file_size} bytes")
             return True
             
         except Exception as e:
-            print(f"验证模型完整性失败: {e}")
+            print(f"Model integrity verification failed: {e}")
             return False
     
     def fix_encoding_issues(self):
-        """修复编码问题"""
-        print("尝试修复Word2Vec编码问题...")
+        """Fix encoding issues"""
+        print("Attempting to fix Word2Vec encoding issues...")
         
-        # 方法1: 使用不同的编码参数加载
+        # Method 1: Load with different encoding parameters
         encoding_methods = [
             {'binary': True, 'unicode_errors': 'ignore'},
             {'binary': True, 'encoding': 'utf-8', 'unicode_errors': 'ignore'},
@@ -66,64 +66,64 @@ class Word2VecDownloader:
         
         for i, params in enumerate(encoding_methods):
             try:
-                print(f"尝试加载方法 {i+1}: {params}")
+                print(f"Attempting loading method {i+1}: {params}")
                 model = KeyedVectors.load_word2vec_format(self.model_path, **params)
-                print(f"✓ 加载成功! 词汇量: {len(model.key_to_index)}")
+                print(f"✓ Loading successful! Vocabulary size: {len(model.key_to_index)}")
                 return model
             except Exception as e:
-                print(f"✗ 方法 {i+1} 失败: {e}")
+                print(f"✗ Method {i+1} failed: {e}")
                 continue
         
         return None
     
     def backup_and_redownload(self):
-        """备份损坏文件并重新下载"""
+        """Backup corrupted files and redownload"""
         if self.check_model_exists():
-            # 备份损坏的文件
+            # Backup corrupted files
             backup_path = self.model_path + '.corrupted'
             try:
                 os.rename(self.model_path, backup_path)
-                print(f"已备份损坏文件到: {backup_path}")
+                print(f"Corrupted file backed up to: {backup_path}")
             except:
                 os.remove(self.model_path)
-                print("已删除损坏文件")
-        
-        # 重新下载
-        print("开始重新下载Word2Vec模型...")
+                print("Corrupted file deleted")
+
+        # Redownload
+        print("Starting to redownload Word2Vec model...")
         return self.download_model()
 
     def download_from_google_drive(self, file_id='0B7XkCwpI5KDYNlNUTTlSS21pQmM'):
-        """从Google Drive下载Word2Vec模型"""
-        print("正在从Google Drive下载Word2Vec模型...")
+        """Download Word2Vec model from Google Drive"""
+        print("Downloading Word2Vec model from Google Drive...")
         url = f'https://drive.google.com/uc?id={file_id}'
         
         try:
-            # 下载文件
+            # Download file
             output_path = self.model_path
             gdown.download(url, output_path, quiet=False)
-            print(f"模型下载完成: {output_path}")
+            print(f"Model download completed: {output_path}")
             return True
         except Exception as e:
-            print(f"从Google Drive下载失败: {e}")
+            print(f"Download from Google Drive failed: {e}")
             return False
     
     def download_from_alternative_source(self):
-        """从备用源下载Word2Vec模型"""
-        print("正在从备用源下载Word2Vec模型...")
+        """Download Word2Vec model from alternative source"""
+        print("Downloading Word2Vec model from alternative source...")
         
-        # 备用下载链接 (这是一个示例，实际使用时需要有效的链接)
+        # Alternative download links (this is an example, valid links are needed for actual use)
         urls = [
             'https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz',
-            # 可以添加更多备用链接
+            # Can add more alternative links
         ]
         
         for url in urls:
             try:
-                print(f"尝试从 {url} 下载...")
+                print(f"Attempting to download from {url}...")
                 response = requests.get(url, stream=True)
                 
                 if response.status_code == 200:
-                    # 如果是压缩文件，需要解压
+                    # If it's a compressed file, need to decompress
                     if url.endswith('.gz'):
                         import gzip
                         output_path = self.model_path + '.gz'
@@ -132,37 +132,37 @@ class Word2VecDownloader:
                             for chunk in response.iter_content(chunk_size=8192):
                                 f.write(chunk)
                         
-                        # 解压文件
+                        # Decompress file
                         with gzip.open(output_path, 'rb') as f_in:
                             with open(self.model_path, 'wb') as f_out:
                                 f_out.write(f_in.read())
                         
-                        # 删除压缩文件
+                        # Delete compressed file
                         os.remove(output_path)
                     else:
                         with open(self.model_path, 'wb') as f:
                             for chunk in response.iter_content(chunk_size=8192):
                                 f.write(chunk)
                     
-                    print(f"模型下载完成: {self.model_path}")
+                    print(f"Model download completed: {self.model_path}")
                     return True
                     
             except Exception as e:
-                print(f"从 {url} 下载失败: {e}")
+                print(f"Download from {url} failed: {e}")
                 continue
         
         return False
     
     def download_smaller_model(self):
-        """下载较小的Word2Vec模型作为替代"""
-        print("正在下载较小的Word2Vec模型...")
+        """Download smaller Word2Vec model as alternative"""
+        print("Downloading smaller Word2Vec model...")
         
         try:
             import gensim.downloader as api
-            # 下载较小的word2vec模型
+            # Download smaller word2vec model
             model = api.load('word2vec-google-news-300')
             
-            # 保存为二进制格式
+            # Save as binary format
             model.save_word2vec_format(self.model_path, binary=True)
             print(f"小型模型下载完成: {self.model_path}")
             return True
