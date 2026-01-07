@@ -45,3 +45,6 @@ data/Comments/  # Large data files
 *.model
 *.h5
 *.pt
+
+# BERT module under migration - exclude from repository
+sentiment_classification_Bert/

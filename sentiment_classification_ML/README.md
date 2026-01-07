@@ -51,7 +51,7 @@ sentiment_classification_ML/
 
 ```bash
 # Install dependencies from project root
-pip install -r ../.claude/requirements.txt
+pip install -r ../requirements.txt
 
 # Initialize NLTK data (first-time setup)
 python init_nltk.py
@@ -348,7 +348,7 @@ remove_low_frequency = True
    ```
    Error: ModuleNotFoundError
    Solution: Install missing dependencies
-   Command: pip install -r ../.claude/requirements.txt
+   Command: pip install -r ../requirements.txt
    ```
 
 4. **Path Reference Issues** (Fixed in latest version)

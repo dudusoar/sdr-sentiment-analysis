@@ -81,10 +81,10 @@ pip install -r requirements.txt
 python -m nltk.downloader stopwords wordnet punkt
 
 # Windows environment setup
-.claude/setup-environment.bat
+setup-environment.bat
 
 # Linux/Mac environment setup
-.claude/setup-environment.sh
+setup-environment.sh
 ```
 
 ### Module Execution
@@ -118,7 +118,7 @@ This project includes three custom skills:
 3. **manage-python-env**: Python virtual environment management using uv
 
 ## Key Configuration Files
-- **requirements.txt**: Project dependencies in `.claude/` directory
+- **requirements.txt**: Project dependencies in project root directory
 - **task-board.md**: Project task management in `.claude/` directory
 - **bug-log.md**: Bug tracking in `.claude/` directory
 - **project.yml**: Serena configuration in `.serena/` directory
