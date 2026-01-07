@@ -73,7 +73,7 @@ Youtube-SC/
 - **Environment Creation Date**: 2026-01-06
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.11+ (3.11.12 recommended for optimal compatibility)
 - [uv](https://github.com/astral-sh/uv) (recommended) or pip
 - Git
 
@@ -421,7 +421,7 @@ claude /manage-python-env
 We welcome contributions! Please follow these guidelines:
 
 ### Code Standards
-- Python 3.8+ compatibility
+- Python 3.11+ compatibility (3.11.12 recommended)
 - PEP 8 coding standards
 - Detailed docstrings (Chinese with English translations)
 - Unit tests for new functionality

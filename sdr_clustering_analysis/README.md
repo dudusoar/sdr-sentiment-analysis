@@ -96,7 +96,7 @@ Each `kX_results` directory contains:
 - Sheet2 `comments`: Sample comments from the cluster
 
 ## Technical Stack
-- **Python 3.8+**
+- **Python 3.11+** (3.11.12 recommended)
 - **Data Processing**: pandas, numpy
 - **Machine Learning**: scikit-learn (KMeans, TF-IDF, metrics)
 - **Text Embeddings**: sentence-transformers (SBERT)

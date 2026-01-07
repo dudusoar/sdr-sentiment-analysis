@@ -12,7 +12,7 @@ echo Checking Python installation...
 python --version
 if %errorlevel% neq 0 (
     echo Error: Python not installed or not in PATH
-    echo Please install Python 3.8+ first
+    echo Please install Python 3.11+ (3.11.12 recommended) first
     pause
     exit /b 1
 )

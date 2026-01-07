@@ -12,7 +12,7 @@ echo "Checking Python installation..."
 python3 --version
 if [ $? -ne 0 ]; then
     echo "Error: Python 3 not installed or not in PATH"
-    echo "Please install Python 3.8+ first"
+    echo "Please install Python 3.11+ (3.11.12 recommended) first"
     exit 1
 fi
 

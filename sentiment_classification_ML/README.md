@@ -428,7 +428,7 @@ python main.py --fix-word2vec
 ## Contribution Guidelines
 
 ### Code Standards
-- Use Python 3.8+
+- Use Python 3.11+ (3.11.12 recommended)
 - Follow PEP 8 coding standards
 - Add detailed docstring documentation
 - Include unit tests
